@@ -124,7 +124,7 @@ function checkData(obj) {
 
 app.post('/setdata/', upload.array(), (req, res) => {
 	
-	database.collection('devices').where('device_uid', '==', req.body.device_uid).get().then(docs => {
+	database.collection('devices').where('device_ref', '==', req.body.device_ref).get().then(docs => {
 		obj = req.body
 		obj['timestamp'] = dateTime()
 		db.collection('data').insertOne(obj, (error, db) => {
@@ -170,7 +170,7 @@ app.post('/getUserDevices/', upload.array(), (req, res) => {
 })
 
 app.post('/getdeviceData/', upload.array(), (req, res) => {
-	db.collection('data').find({'device_uid': req.body.device_uid}).sort({timestamp: -1}).toArray((error, data) => {
+	db.collection('data').find({'device_ref': req.body.device_ref}).sort({timestamp: -1}).toArray((error, data) => {
 		if(error) return res.status(403).send('Could Not Get Data');
 		res.setHeader('Content-Type', 'application/json');
     	return res.status(200).send(data);
@@ -179,7 +179,7 @@ app.post('/getdeviceData/', upload.array(), (req, res) => {
 
 
 app.post('/getlatestdata/', upload.array(), (req, res) => {
-	db.collection('data').find({'device_uid': req.body.device_uid}).sort({timestamp: -1 }).toArray((error, data) => {
+	db.collection('data').find({'device_ref': req.body.device_ref}).sort({timestamp: -1 }).toArray((error, data) => {
 		if(error) return res.status(403).send('Could Not Get Data');
 		res.setHeader('Content-Type', 'application/json');
     		return res.status(200).send(data[0]);
@@ -223,7 +223,7 @@ app.post('/getmessages/', upload.array(), (req, res) => {
 })
 
 app.post('/devicesub/', upload.array(), (req, res) => {
-	database.collection('devices').where('clients.'+req.body.client_uid, '==', 'true').get().then(docs => {
+	database.collection('linked_devices').where('client_uid', '==', req.body.client_uid).get().then(docs => {
 		var obj=[];
 		docs.forEach(function(doc) {
 			obj.push(doc.data().device_ref)
