@@ -171,6 +171,34 @@ app.post('/getUserDevices/', upload.array(), (req, res) => {
 	
 })
 
+app.post('/getUserDevicesInfo/', upload.array(), (req, res) => {
+	var ref = []
+	var d = []
+
+	database.collection('linked_devices').where('client_uid', '==', req.body.client_uid).get().then(docs => {
+		docs.forEach(function(doc) {
+			ref.push(doc.data().device_ref)
+		})
+
+		database.collection('devices').get().then(docs => {
+			docs.forEach(doc => {
+				if(d.indexOf(doc.data().device_ref) != -1) {
+					d.push(doc.data());
+				}
+		      });
+			res.setHeader('Content-Type', 'application/json');
+			return res.status(200).send(d);
+		}).catch(error => {
+			return res.status(403).send('Could Not Get Devices');
+		})
+		return true;
+	}).catch(error => {
+		console.log(error)
+		return res.status(403).send('Could Not Get Devices');
+	})
+	
+})
+
 app.post('/getdeviceData/', upload.array(), (req, res) => {
 	db.collection('data').find({'device_ref': req.body.device_ref}).sort({timestamp: -1}).toArray((error, data) => {
 		if(error) return res.status(403).send('Could Not Get Data');
