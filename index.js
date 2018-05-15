@@ -37,9 +37,11 @@ app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true, inflate: true })); // for parsing application/x-www-form-urlencoded
 app.use(cookieParser());
 
-
-
-
+app.use(function(req, res, next) {  
+      res.header('Access-Control-Allow-Origin', req.headers.origin);
+      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+      next();
+ }); 
 
 /* --------------------------------------------------------------------- */
 /*
@@ -155,7 +157,7 @@ app.post('/setToken/', upload.array(), (req, res) => {
 app.post('/getUserDevices/', upload.array(), (req, res) => {
 	var d = []
 
-	database.collection('devices').where('clients.'+req.body.client_uid, '==', 'true').get().then(docs => {
+	database.collection('linked_devices').where('client_uid', '==', req.body.client_uid).get().then(docs => {
 		docs.forEach(function(doc) {
 			d.push(doc.data())
 		})
@@ -177,6 +179,14 @@ app.post('/getdeviceData/', upload.array(), (req, res) => {
 	})
 })
 
+
+app.post('/getdatedata/', upload.array(), (req, res) => {
+	db.collection('data').find({device_ref: req.body.device_ref, timestamp: new RegExp(req.body.date)}).sort({timestamp: 1}).toArray((error, data) => {
+		if(error) return res.status(403).send('Could Not Get Data');
+		res.setHeader('content-type', 'application/json');
+		return res.status(200).send(data);
+	})
+})
 
 app.post('/getlatestdata/', upload.array(), (req, res) => {
 	db.collection('data').find({'device_ref': req.body.device_ref}).sort({timestamp: -1 }).toArray((error, data) => {
