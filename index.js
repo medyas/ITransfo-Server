@@ -180,10 +180,10 @@ app.post('/getUserDevicesInfo/', upload.array(), (req, res) => {
 			ref.push(doc.data().device_ref)
 		})
 
-		database.collection('devices').get().then(docs => {
-			docs.forEach(doc => {
-				if(d.indexOf(doc.data().device_ref) != -1) {
-					d.push(doc.data());
+		database.collection('devices').get().then(snapshots => {
+			snapshots.forEach(snapshot => {
+				if(ref.indexOf(snapshot.data().device_ref) != -1) {
+					d.push(snapshot.data());
 				}
 		      });
 			res.setHeader('Content-Type', 'application/json');
