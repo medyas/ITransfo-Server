@@ -241,10 +241,26 @@ app.post('/getparameters/', upload.array(), (req, res) => {
 		db.collection('parameters').find({'device_ref': req.body.device_ref}).toArray((error, data) => {
 			if(error) return res.status(403).send('Could Not Get Data');
 			res.setHeader('Content-Type', 'application/json');
-	    		return res.status(200).send(data);
+	    	return res.status(200).send(data);
 		})
 	}).catch(error => {
 		return res.status(403).send('Could Not Get Parameters');
+	})
+})
+
+app.post('/updateprameters/', upload.array(), (req, res) => {
+	database.collection('devices').where('device_ref', '==', req.body.device_ref).get().then(docs => {
+		db.collection('parameters').update({'device_ref': req.body.device_ref}, {$set:{
+			'pri_voltage': req.body.pri_voltage,
+		    'sec_voltage': req.body.sec_voltage
+		    'pri_current': req.body.pri_current,
+		    'sec_current': req.body.sec_current,
+		    'internal_temp': req.body.internal_temp,
+		    'external_temp': req.body.external_temp
+		}})
+		return res.status(200).send('done');
+	}).catch(error => {
+		return res.status(403).send('Could Set Device prameters');
 	})
 })
 
