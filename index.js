@@ -227,7 +227,7 @@ app.post('/setdata/', upload.array(), (req, res) => {
 		obj['timestamp'] = dateTime()
 		db.collection('data').insertOne(obj, (error, db) => {
 			if (error) return res.status(403).send('Could Not set Data');
-			return res.status(200).send("done");
+			
 		})
 		//checkData(obj);
 		console.log("data test started")
@@ -243,10 +243,10 @@ app.post('/setdata/', upload.array(), (req, res) => {
 					console.log("Send alarm msg")
 					setMessages(d);
 					sendNotification("ITransfo: Device Warning", "Device Warning - "+obj.device_ref+" \n"+data.msg, obj.device_ref);
-					return "done";
+					return res.status(200).send("done");
 				}
 			}).catch( error => {
-				return "error";
+				return res.status(400).send("Error Checking Data");
 			});
 		return true;
 	}).catch(error => {
