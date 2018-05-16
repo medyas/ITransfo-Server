@@ -123,11 +123,10 @@ function getParams(ref) {
 }
 
 async function compareData(obj) {
-	const params = await getParams(obj.device_ref);
 	return new Promise((resolve, reject) => {
-		if(params == null) reject("Params Not Found");
-
-		var result = {
+		getParams(obj.device_ref).then(data => {
+			var params = data;
+			var result = {
 			'status': false,
 			'msg': ""
 		}
@@ -178,6 +177,11 @@ async function compareData(obj) {
 		}
 
 		resolve(result);
+		}).catch(error => {
+			reject("Params Not Found");
+		})
+
+		
 	})
 }
 
