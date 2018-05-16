@@ -108,7 +108,7 @@ function sendNotification(title, msg, ref) {
 
 	// Send a message to devices subscribed to the combination of topics
 	// specified by the provided condition.
-	admin.messaging().send(message)
+	messages.send(message)
 	  .then((response) => {
 	    // Response is a message ID string.
 	    console.log('message sent!');
