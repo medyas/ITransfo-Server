@@ -122,11 +122,11 @@ function getParams(ref) {
 	})
 }
 
-function compareData(obj) {
+async function compareData(obj) {
 	return new Promise((resolve, reject) => {
 		const params = await getParams(obj.device_ref);
 		if(params == null) reject("Params Not Found");
-		
+
 		var result = {
 			'status': false,
 			'msg': ""
@@ -182,7 +182,7 @@ function compareData(obj) {
 }
 
 
-async function checkData(obj) {
+function checkData(obj) {
 	console.log("data test started")
 	compareData(obj).then(data => {
 		console.log(data);
