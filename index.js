@@ -331,7 +331,7 @@ app.post('/getdatedata/', upload.array(), (req, res) => {
 })
 
 app.post('/getlatestdata/', upload.array(), (req, res) => {
-	db.collection('data').find({'device_ref': req.body.device_ref}).sort({timestamp: -1 }).toArray((error, data) => {
+	db.collection('data').find({'device_ref': req.body.device_ref}).limit(1).sort({$natural:-1}).toArray((error, data) => {
 		if(error) return res.status(403).send('Could Not Get Data');
 		res.setHeader('Content-Type', 'application/json');
     		return res.status(200).send(data[0]);
