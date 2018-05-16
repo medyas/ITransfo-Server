@@ -41,7 +41,23 @@ app.use(function(req, res, next) {
       res.header('Access-Control-Allow-Origin', req.headers.origin);
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       next();
- }); 
+ });
+
+function isAuthenticated(req, res, next) {
+	
+	const sessionCookie = req.body.__session || '';
+    admin.auth().verifySessionCookie(
+	    sessionCookie, true).then((decodedClaims) => {
+			res.locals.admin = (decodedClaims.admin.toString() === 'true')? true: false;
+			res.locals.supervisor = (decodedClaims.supervisor.toString() === 'true')? true: false;
+			return next();
+	  }).catch(error => {
+	    res.status(401).send('UNAUTHORIZED REQUEST!');
+	  });
+	
+}
+
+//app.use(isAuthenticated());
 
 /* --------------------------------------------------------------------- */
 /*
@@ -50,15 +66,15 @@ app.use(function(req, res, next) {
 
 */
 
-	function dateTime() {
-		var currentdate = new Date(); 
-		return  currentdate.getDate() + "/"
-	                + (currentdate.getMonth()+1)  + "/" 
-	                + currentdate.getFullYear() + " "  
-	                + currentdate.getHours() + ":"  
-	                + currentdate.getMinutes() + ":" 
-	                + currentdate.getSeconds();
-	}
+function dateTime() {
+	var currentdate = new Date(); 
+	return  currentdate.getDate() + "/"
+                + (currentdate.getMonth()+1)  + "/" 
+                + currentdate.getFullYear() + " "  
+                + currentdate.getHours() + ":"  
+                + currentdate.getMinutes() + ":" 
+                + currentdate.getSeconds();
+}
 
 
 function setMessages(obj) {
@@ -141,7 +157,9 @@ app.post('/setdata/', upload.array(), (req, res) => {
 })
 
 
-/**		Set User Notification Token
+/**		
+**		
+**		Set User Notification Token
 **
 */
 
@@ -154,6 +172,29 @@ app.post('/setToken/', upload.array(), (req, res) => {
 })
 
 
+/**		
+**		
+**		return device_ref of the User devices
+**
+*/
+app.post('/devicesub/', upload.array(), (req, res) => {
+	database.collection('linked_devices').where('client_uid', '==', req.body.client_uid).get().then(docs => {
+		var obj=[];
+		docs.forEach(function(doc) {
+			obj.push(doc.data().device_ref)
+		})
+		res.setHeader('Content-Type', 'application/json');
+	    return res.status(200).send(obj);
+	}).catch(error => {
+		return res.status(403).send('Could Not Get Parameters');
+	})
+})
+
+/**		
+**		
+**		Getters and Setters
+**
+*/
 app.post('/getUserDevices/', upload.array(), (req, res) => {
 	var d = []
 
@@ -275,20 +316,6 @@ app.post('/getmessages/', upload.array(), (req, res) => {
 		return res.status(403).send('Could Not Get Parameters');
 	})
 })
-
-app.post('/devicesub/', upload.array(), (req, res) => {
-	database.collection('linked_devices').where('client_uid', '==', req.body.client_uid).get().then(docs => {
-		var obj=[];
-		docs.forEach(function(doc) {
-			obj.push(doc.data().device_ref)
-		})
-		res.setHeader('Content-Type', 'application/json');
-	    return res.status(200).send(obj);
-	}).catch(error => {
-		return res.status(403).send('Could Not Get Parameters');
-	})
-})
-
 
 
 /* --------------------------------------------------------------------- */
