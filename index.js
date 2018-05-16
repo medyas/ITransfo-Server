@@ -123,8 +123,8 @@ function getParams(ref) {
 }
 
 async function compareData(obj) {
+	const params = await getParams(obj.device_ref);
 	return new Promise((resolve, reject) => {
-		const params = await getParams(obj.device_ref);
 		if(params == null) reject("Params Not Found");
 
 		var result = {
