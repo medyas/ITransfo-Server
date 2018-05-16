@@ -112,20 +112,13 @@ function sendNotification(title, msg, ref) {
 	    return false;
 	  });
 } 
-/*
-function getParams(ref) {
-	db.collection('parameters').findOne({'device_ref': ref}).toArray((error, data) => {
-			if(error) return null;
-			return data;
-		})
-}
-*/
+
 function compareData(obj) {
-	return new Promise((resolve, reject) => {
+	return new Promise(resolve => {
 		db.collection('parameters').findOne({'device_ref': obj.device_ref}).toArray((error, data) => {
-			if(error) reject("Could not get data");
+			if(error) console.log("Could not get data");
 			var params = data;
-			resolve(data);
+			console.log(data);
 			var result = {
 				'status': false,
 				'msg': ""
@@ -178,31 +171,30 @@ function compareData(obj) {
 
 			resolve(result);
 		})
-		
 	});
 }
 
-/*
+
 async function checkData(obj) {
 	console.log("data test started")
-	compareData(obj).then(data => {
-			console.log(data);
-			if(data.status) {
-				d = {
-					'msg': data.msg,
-					'data_id': obj._id,
-					'device_ref': obj.device_ref,
-					'timestamp': dateTime()
-				};
-				console.log("Send alarm msg")
-				setMessages(d);
-				sendNotification("ITransfo: Device Warning", "Device Warning - "+obj.device_ref+" \n"+data.msg, obj.device_ref);
-				return "done";
-			}
-		}).catch( error => {
-			return "error";
-		});
-}*/
+	const data = await compareData(obj);
+	console.log(data);
+	if(data.status) {
+		d = {
+			'msg': data.msg,
+			'data_id': obj._id,
+			'device_ref': obj.device_ref,
+			'timestamp': dateTime()
+		};
+		console.log("Send alarm msg")
+		setMessages(d);
+		sendNotification("ITransfo: Device Warning", "Device Warning - "+obj.device_ref+" \n"+data.msg, obj.device_ref);
+		return "done";
+	}
+	else {
+		console.log("status Error");
+	}
+}
 
   
 
@@ -226,22 +218,8 @@ app.post('/setdata/', upload.array(), (req, res) => {
 			if (error) return res.status(403).send('Could Not set Data');
 			
 		})
-		//checkData(obj);
-		console.log("data test started")
-		compareData(obj).then(data => {
-				console.log(data);
-				if(data.status) {
-					d = {
-						'msg': data.msg,
-						'data_id': obj._id,
-						'device_ref': obj.device_ref,
-						'timestamp': dateTime()
-					};
-					console.log("Send alarm msg")
-					setMessages(d);
-					sendNotification("ITransfo: Device Warning", "Device Warning - "+obj.device_ref+" \n"+data.msg, obj.device_ref);
-					return res.status(200).send("done");
-				}
+		checkData(obj).then(data => {
+				return res.status(200).send("done");
 			}).catch( error => {
 				return res.status(400).send(error);
 			});
