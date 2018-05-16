@@ -113,87 +113,98 @@ function sendNotification(title, msg, ref) {
 	  });
 } 
 
+function getParams(ref) {
+	return new Promise((resolve, reject) => {
+		db.collection('parameters').findOne({'device_ref': ref}).toArray((error, data) => {
+			if(error) reject(null)
+			resolve(data)
+		});
+	})
+}
+
 function compareData(obj) {
-	return new Promise(resolve => {
-		db.collection('parameters').findOne({'device_ref': obj.device_ref}).toArray((error, data) => {
-			if(error) console.log("Could not get data");
-			var params = data;
-			console.log(data);
-			var result = {
-				'status': false,
-				'msg': ""
-			}
-			console.log(params)
-			var transfo = {
-				'pri_voltage': (30000*parseInt(params.pri_voltage)/100),
-				'sec_voltage': (400*parseInt(params.sec_voltage)/100),
-				'pri_current': (12.12*parseInt(params.pri_current)/100),
-				'sec_current': (909.35*parseInt(params.sec_current)/100),
-				'internal_temp': params.internal_temp,
-				'external_temp': params.external_temp
-			}
+	return new Promise((resolve, reject) => {
+		const params = await getParams(obj.device_ref);
+		if(params == null) reject("Params Not Found");
+		
+		var result = {
+			'status': false,
+			'msg': ""
+		}
+		console.log(params)
+		var transfo = {
+			'pri_voltage': (30000*parseInt(params.pri_voltage)/100),
+			'sec_voltage': (400*parseInt(params.sec_voltage)/100),
+			'pri_current': (12.12*parseInt(params.pri_current)/100),
+			'sec_current': (909.35*parseInt(params.sec_current)/100),
+			'internal_temp': params.internal_temp,
+			'external_temp': params.external_temp
+		}
 
-			if((obj.pri_voltage_p1 >= (30000+transfo.pri_voltage) || obj.pri_voltage_p1 <= (30000-transfo.pri_voltage)) || (obj.pri_voltage_p2 >= (30000+transfo.pri_voltage) || obj.pri_voltage_p2 <= (30000-transfo.pri_voltage)) || (obj.pri_voltage_p3 >= (30000+transfo.pri_voltage) || obj.pri_voltage_p3 <= (30000-transfo.pri_voltage))) {
-				result = {
-					'status': true,
-					'msg': "Primary Voltage Bypassed its limits"
-				}
-				resolve(result);
+		if((obj.pri_voltage_p1 >= (30000+transfo.pri_voltage) || obj.pri_voltage_p1 <= (30000-transfo.pri_voltage)) || (obj.pri_voltage_p2 >= (30000+transfo.pri_voltage) || obj.pri_voltage_p2 <= (30000-transfo.pri_voltage)) || (obj.pri_voltage_p3 >= (30000+transfo.pri_voltage) || obj.pri_voltage_p3 <= (30000-transfo.pri_voltage))) {
+			result = {
+				'status': true,
+				'msg': "Primary Voltage Bypassed its limits"
 			}
-			else if((obj.sec_voltage_p1 >= (400+transfo.sec_voltage) || obj.sec_voltage_p1 <= (400-transfo.sec_voltage)) || (obj.sec_voltage_p2 >= (400+transfo.sec_voltage) || obj.sec_voltage_p2 <= (400-transfo.sec_voltage)) || (obj.sec_voltage_p3 >= (400+transfo.sec_voltage) || obj.sec_voltage_p3 <= (400-transfo.sec_voltage))) {
-				result = {
-					'status': true,
-					'msg': "Secondary Voltage Bypassed its limits"
-				}
-				resolve(result);
-			}
-			else if((obj.pri_current_p1 >= (12.12+transfo.pri_current) || obj.pri_current_p1 <= (12.12-transfo.pri_current)) || (obj.pri_current_p2 >= (12.12+transfo.pri_current) || obj.pri_current_p2 <= (12.12-transfo.pri_current)) || (obj.pri_current_p3 >= (12.12+transfo.pri_current) || obj.pri_current_p3 <= (12.12-transfo.pri_current))) {
-				result = {
-					'status': true,
-					'msg': "Primary Current Bypassed its limits"
-				}
-				resolve(result);
-			}
-			else if((obj.sec_current_p1 >= (909.35+transfo.sec_current) || obj.sec_current_p1 <= (909.35-transfo.sec_current)) || (obj.sec_current_p2 >= (909.35+transfo.sec_current) || obj.sec_current_p2 <= (909.35-transfo.sec_current)) || (obj.sec_current_p3 >= (909.35+transfo.sec_current) || obj.sec_current_p3 <= (909.35-transfo.sec_current))) {
-				result = {
-					'status': true,
-					'msg': "Secondary Current Bypassed its limits"
-				}
-				resolve(result);
-			}
-			else if(obj.internal_temp >= itransfo.internal_temp || obj,external_temp >= itransfo.external_temp) {
-				result = {
-					'status': true,
-					'msg': "Temperature Bypassed its limits"
-				}				
-				resolve(result);
-			}
-
 			resolve(result);
-		})
-	});
+		}
+		else if((obj.sec_voltage_p1 >= (400+transfo.sec_voltage) || obj.sec_voltage_p1 <= (400-transfo.sec_voltage)) || (obj.sec_voltage_p2 >= (400+transfo.sec_voltage) || obj.sec_voltage_p2 <= (400-transfo.sec_voltage)) || (obj.sec_voltage_p3 >= (400+transfo.sec_voltage) || obj.sec_voltage_p3 <= (400-transfo.sec_voltage))) {
+			result = {
+				'status': true,
+				'msg': "Secondary Voltage Bypassed its limits"
+			}
+			resolve(result);
+		}
+		else if((obj.pri_current_p1 >= (12.12+transfo.pri_current) || obj.pri_current_p1 <= (12.12-transfo.pri_current)) || (obj.pri_current_p2 >= (12.12+transfo.pri_current) || obj.pri_current_p2 <= (12.12-transfo.pri_current)) || (obj.pri_current_p3 >= (12.12+transfo.pri_current) || obj.pri_current_p3 <= (12.12-transfo.pri_current))) {
+			result = {
+				'status': true,
+				'msg': "Primary Current Bypassed its limits"
+			}
+			resolve(result);
+		}
+		else if((obj.sec_current_p1 >= (909.35+transfo.sec_current) || obj.sec_current_p1 <= (909.35-transfo.sec_current)) || (obj.sec_current_p2 >= (909.35+transfo.sec_current) || obj.sec_current_p2 <= (909.35-transfo.sec_current)) || (obj.sec_current_p3 >= (909.35+transfo.sec_current) || obj.sec_current_p3 <= (909.35-transfo.sec_current))) {
+			result = {
+				'status': true,
+				'msg': "Secondary Current Bypassed its limits"
+			}
+			resolve(result);
+		}
+		else if(obj.internal_temp >= itransfo.internal_temp || obj,external_temp >= itransfo.external_temp) {
+			result = {
+				'status': true,
+				'msg': "Temperature Bypassed its limits"
+			}				
+			resolve(result);
+		}
+
+		resolve(result);
+	})
 }
 
 
 async function checkData(obj) {
 	console.log("data test started")
-	const data = await compareData(obj);
-	console.log(data);
-	if(data.status) {
-		d = {
-			'msg': data.msg,
-			'data_id': obj._id,
-			'device_ref': obj.device_ref,
-			'timestamp': dateTime()
-		};
-		console.log("Send alarm msg")
-		setMessages(d);
-		sendNotification("ITransfo: Device Warning", "Device Warning - "+obj.device_ref+" \n"+data.msg, obj.device_ref);
-		return "done";
-	}
-	else {
-		console.log("status Error");
-	}
+	compareData(obj).then(data => {
+		console.log(data);
+		if(data.status) {
+			d = {
+				'msg': data.msg,
+				'data_id': obj._id,
+				'device_ref': obj.device_ref,
+				'timestamp': dateTime()
+			};
+			console.log("Send alarm msg")
+			//setMessages(d);
+			//sendNotification("ITransfo: Device Warning", "Device Warning - "+obj.device_ref+" \n"+data.msg, obj.device_ref);
+			return "done";
+		}
+		else {
+			console.log("status Error");
+		}
+	}).catch( error => {
+		return "Compare Error: "+error
+	});
+	
 }
 
   
