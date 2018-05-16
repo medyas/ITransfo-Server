@@ -242,7 +242,7 @@ app.post('/setdata/', upload.array(), (req, res) => {
 					return res.status(200).send("done");
 				}
 			}).catch( error => {
-				return res.status(400).send("Error Checking Data");
+				return res.status(400).send(error);
 			});
 		return true;
 	}).catch(error => {
