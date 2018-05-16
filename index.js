@@ -113,18 +113,10 @@ function sendNotification(title, msg, ref) {
 	  });
 } 
 
-function getParams(ref) {
+function getParams(obj) {
 	return new Promise((resolve, reject) => {
-		db.collection('parameters').findOne({'device_ref': ref}).toArray((error, data) => {
+		db.collection('parameters').findOne({'device_ref': obj.device_ref}).toArray((error, data) => {
 			if(error) reject(null)
-			resolve(data)
-		});
-	})
-}
-
-async function compareData(obj) {
-	return new Promise((resolve, reject) => {
-		getParams(obj.device_ref).then(data => {
 			var params = data;
 			var result = {
 			'status': false,
@@ -177,6 +169,14 @@ async function compareData(obj) {
 		}
 
 		resolve(result);
+		});
+	})
+}
+
+async function compareData(obj) {
+	return new Promise((resolve, reject) => {
+		getParams(obj.device_ref).then(data => {
+			
 		}).catch(error => {
 			reject("Params Not Found");
 		})
@@ -188,7 +188,7 @@ async function compareData(obj) {
 
 function checkData(obj) {
 	console.log("data test started")
-	compareData(obj).then(data => {
+	getParams(obj).then(data => {
 		console.log(data);
 		if(data.status) {
 			d = {
@@ -198,8 +198,8 @@ function checkData(obj) {
 				'timestamp': dateTime()
 			};
 			console.log("Send alarm msg")
-			//setMessages(d);
-			//sendNotification("ITransfo: Device Warning", "Device Warning - "+obj.device_ref+" \n"+data.msg, obj.device_ref);
+			setMessages(d);
+			sendNotification("ITransfo: Device Warning", "Device Warning - "+obj.device_ref+" \n"+data.msg, obj.device_ref);
 			return "done";
 		}
 		else {
