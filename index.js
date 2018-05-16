@@ -127,6 +127,7 @@ function compareData(obj) {
 			'status': false,
 			'msg': ""
 		}
+		console.log(params)
 		if(params != null) {
 			var transfo = {
 				'pri_voltage': (30000*parseInt(params.pri_voltage)/100),
@@ -179,8 +180,10 @@ function compareData(obj) {
 
 
 function checkData(obj) {
+	console.log("data test started")
 	return new Promise((resolve, reject) => {
 		compareData(obj).then(data => {
+			console.log(data);
 			if(data.status) {
 				d = {
 					'msg': data.msg,
@@ -190,10 +193,10 @@ function checkData(obj) {
 				};
 				setMessages(d);
 				sendNotification("ITransfo: Device Warning", "Device Warning - "+obj.device_ref+" \n"+data.msg, obj.device_ref);
-				return true;
+				return resolve("done");
 			}
 		}).catch( error => {
-
+			return reject("error");
 		});
 		
     });
@@ -216,13 +219,16 @@ app.post('/setdata/', upload.array(), (req, res) => {
 	
 	database.collection('devices').where('device_ref', '==', req.body.device_ref).get().then(docs => {
 		obj = req.body
-		checkData(obj);
 		obj['timestamp'] = dateTime()
 		db.collection('data').insertOne(obj, (error, db) => {
 			if (error) return res.status(403).send('Could Not set Data');
 			return res.status(200).send("done");
 		})
-		checkData(obj);
+		checkData(obj).then(data => {
+			console.log(data);
+		}).catch(error => {
+			console.log(error);
+		});
 		return true
 	}).catch(error => {
 		return res.status(403).send('Could Not set Data');
