@@ -89,14 +89,21 @@ function setMessages(obj) {
 
 function sendNotification(title, msg, ref) {
 	var message = {
-	  notification: {
-	    title: title,
-	    body: msg
-	  },
-	  data: {
-	  	device_ref: ref
-	  },
-	  topic: ref
+		 android: {
+		    ttl: 3600 * 1000, // 1 hour in milliseconds
+		    priority: 'normal',
+		    notification: {
+		        title: title,
+		        body: msg,
+		        icon: '',
+		        color: '#f45342'
+		    },
+		    data: {
+				device_ref: ref
+			}
+		  },
+
+		topic: ref
 	};
 
 	// Send a message to devices subscribed to the combination of topics
@@ -223,7 +230,6 @@ app.post('/setdata/', upload.array(), (req, res) => {
 			
 		})
 		checkData(obj).then(data => {
-				console.log(data);
 				return res.status(200).send("done");
 			}).catch( error => {
 				console.log(error);
