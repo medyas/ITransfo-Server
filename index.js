@@ -108,14 +108,14 @@ function sendNotification(title, msg, ref) {
 
 	// Send a message to devices subscribed to the combination of topics
 	// specified by the provided condition.
-	messages.send(message)
+	admin.messaging().send(message)
 	  .then((response) => {
 	    // Response is a message ID string.
 	    console.log('message sent!');
 	    return true;
 	  })
 	  .catch((error) => {
-	  	console.log('could not send message :(');
+	  	console.log('could not send message :( '+  error);
 	    return false;
 	  });
 } 
