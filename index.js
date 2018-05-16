@@ -125,6 +125,7 @@ function compareData(obj) {
 		db.collection('parameters').findOne({'device_ref': obj.device_ref}).toArray((error, data) => {
 			if(error) reject("Could not get data");
 			var params = data;
+			resolve(data);
 			var result = {
 				'status': false,
 				'msg': ""
@@ -144,38 +145,38 @@ function compareData(obj) {
 					'status': true,
 					'msg': "Primary Voltage Bypassed its limits"
 				}
-				return resolve(result);
+				resolve(result);
 			}
 			else if((obj.sec_voltage_p1 >= (400+transfo.sec_voltage) || obj.sec_voltage_p1 <= (400-transfo.sec_voltage)) || (obj.sec_voltage_p2 >= (400+transfo.sec_voltage) || obj.sec_voltage_p2 <= (400-transfo.sec_voltage)) || (obj.sec_voltage_p3 >= (400+transfo.sec_voltage) || obj.sec_voltage_p3 <= (400-transfo.sec_voltage))) {
 				result = {
 					'status': true,
 					'msg': "Secondary Voltage Bypassed its limits"
 				}
-				return resolve(result);
+				resolve(result);
 			}
 			else if((obj.pri_current_p1 >= (12.12+transfo.pri_current) || obj.pri_current_p1 <= (12.12-transfo.pri_current)) || (obj.pri_current_p2 >= (12.12+transfo.pri_current) || obj.pri_current_p2 <= (12.12-transfo.pri_current)) || (obj.pri_current_p3 >= (12.12+transfo.pri_current) || obj.pri_current_p3 <= (12.12-transfo.pri_current))) {
 				result = {
 					'status': true,
 					'msg': "Primary Current Bypassed its limits"
 				}
-				return resolve(result);
+				resolve(result);
 			}
 			else if((obj.sec_current_p1 >= (909.35+transfo.sec_current) || obj.sec_current_p1 <= (909.35-transfo.sec_current)) || (obj.sec_current_p2 >= (909.35+transfo.sec_current) || obj.sec_current_p2 <= (909.35-transfo.sec_current)) || (obj.sec_current_p3 >= (909.35+transfo.sec_current) || obj.sec_current_p3 <= (909.35-transfo.sec_current))) {
 				result = {
 					'status': true,
 					'msg': "Secondary Current Bypassed its limits"
 				}
-				return resolve(result);
+				resolve(result);
 			}
 			else if(obj.internal_temp >= itransfo.internal_temp || obj,external_temp >= itransfo.external_temp) {
 				result = {
 					'status': true,
 					'msg': "Temperature Bypassed its limits"
 				}				
-				return resolve(result);
+				resolve(result);
 			}
 
-			return resolve(result);
+			resolve(result);
 		})
 		
 	});
