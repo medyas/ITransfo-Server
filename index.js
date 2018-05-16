@@ -115,11 +115,11 @@ function sendNotification(title, msg, ref) {
 
 function getParams(obj) {
 	return new Promise((resolve, reject) => {
-		db.collection('parameters').findOne({'device_ref': obj.device_ref}).toArray((error, data) => {
+		db.collection('parameters').find({'device_ref': obj.device_ref}).toArray((error, data) => {
 			if(error) {
 				reject(null)
 			}
-			var params = data;
+			var params = data[0];
 			var result = {
 				'status': false,
 				'msg': ""
