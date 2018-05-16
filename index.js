@@ -233,7 +233,7 @@ app.post('/setdata/', upload.array(), (req, res) => {
 			if (error) return res.status(403).send('Could Not set Data');
 			
 		})
-		checkData(obj).then(data => {
+		getParams(obj).then(data => {
 				return res.status(200).send("done");
 			}).catch( error => {
 				return res.status(400).send(error);
