@@ -113,7 +113,7 @@ function sendNotification(title, msg, ref) {
 	  });
 } 
 
-function getParams(obj) {
+function compareData(obj) {
 	return new Promise((resolve, reject) => {
 		db.collection('parameters').find({'device_ref': obj.device_ref}).toArray((error, data) => {
 			if(error) {
@@ -124,7 +124,6 @@ function getParams(obj) {
 				'status': false,
 				'msg': ""
 			}
-			console.log(params)
 			var transfo = {
 				'pri_voltage': (30000*parseInt(params.pri_voltage)/100),
 				'sec_voltage': (400*parseInt(params.sec_voltage)/100),
@@ -175,22 +174,10 @@ function getParams(obj) {
 	})
 }
 
-async function compareData(obj) {
-	return new Promise((resolve, reject) => {
-		getParams(obj.device_ref).then(data => {
-			
-		}).catch(error => {
-			reject("Params Not Found");
-		})
 
-		
-	})
-}
-
-
-function checkData(obj) {
+async function checkData(obj) {
 	console.log("data test started")
-	getParams(obj).then(data => {
+	compareData(obj).then(data => {
 		console.log(data);
 		if(data.status) {
 			d = {
@@ -205,7 +192,7 @@ function checkData(obj) {
 			return "done";
 		}
 		else {
-			console.log("status Error");
+			console.log("status: No Error");
 		}
 	}).catch( error => {
 		return "Compare Error: "+error
@@ -235,7 +222,7 @@ app.post('/setdata/', upload.array(), (req, res) => {
 			if (error) return res.status(403).send('Could Not set Data');
 			
 		})
-		getParams(obj).then(data => {
+		checkData(obj).then(data => {
 				console.log(data);
 				return res.status(200).send("done");
 			}).catch( error => {
