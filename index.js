@@ -221,7 +221,24 @@ app.post('/setdata/', upload.array(), (req, res) => {
 			if (error) return res.status(403).send('Could Not set Data');
 			return res.status(200).send("done");
 		})
-		checkData(obj);
+		//checkData(obj);
+		console.log("data test started")
+		compareData(obj).then(data => {
+				console.log(data);
+				if(data.status) {
+					d = {
+						'msg': data.msg,
+						'data_id': obj._id,
+						'device_ref': obj.device_ref,
+						'timestamp': dateTime()
+					};
+					setMessages(d);
+					sendNotification("ITransfo: Device Warning", "Device Warning - "+obj.device_ref+" \n"+data.msg, obj.device_ref);
+					return "done";
+				}
+			}).catch( error => {
+				return "error";
+			});
 		return true;
 	}).catch(error => {
 		return res.status(403).send('Could Not set Data');
