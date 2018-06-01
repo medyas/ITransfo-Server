@@ -90,13 +90,11 @@ function setMessages(obj) {
 function sendNotification(title, msg, ref) {
 	var message = {
 		 android: {
-		    ttl: 3600 * 1000, // 1 hour in milliseconds
+		    ttl: 604800 * 1000, // 1 hour in milliseconds
 		    priority: 'normal',
 		    notification: {
 		        title: title,
 		        body: msg,
-		        icon: '',
-		        color: '#f45342'
 		    },
 		    data: {
 				device_ref: ref
@@ -374,6 +372,8 @@ app.post('/getparameters/', upload.array(), (req, res) => {
 	})
 })
 
+
+// * update the function to restrict access only to supervisors
 app.post('/updateprameters/', upload.array(), (req, res) => {
 	database.collection('devices').where('device_ref', '==', req.body.device_ref).get().then(docs => {
 		db.collection('parameters').update({'device_ref': req.body.device_ref}, {$set:{
