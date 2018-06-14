@@ -376,15 +376,26 @@ app.post('/getparameters/', upload.array(), (req, res) => {
 // * update the function to restrict access only to supervisors
 app.post('/updateprameters/', upload.array(), (req, res) => {
 	database.collection('devices').where('device_ref', '==', req.body.device_ref).get().then(docs => {
-		db.collection('parameters').update({'device_ref': req.body.device_ref}, {$set:{
-			'pri_voltage': req.body.pri_voltage,
-		    'sec_voltage': req.body.sec_voltage,
-		    'pri_current': req.body.pri_current,
-		    'sec_current': req.body.sec_current,
-		    'internal_temp': req.body.internal_temp,
-		    'external_temp': req.body.external_temp
-		}})
-		return res.status(200).send('done');
+		database.collection('users').doc(req.body.uid).then(user => {
+			if(user.data().supervisor == "true") {
+				db.collection('parameters').update({'device_ref': req.body.device_ref}, {$set:{
+					'pri_voltage': req.body.pri_voltage,
+				    'sec_voltage': req.body.sec_voltage,
+				    'pri_current': req.body.pri_current,
+				    'sec_current': req.body.sec_current,
+				    'internal_temp': req.body.internal_temp,
+				    'external_temp': req.body.external_temp
+				}})
+				return res.status(200).send('done');
+			}
+			else {
+				return res.status(400).send('error');
+			}
+			
+		}).catch(error => {
+			return res.status(400).send('error');
+		});
+		
 	}).catch(error => {
 		return res.status(403).send('Could Set Device prameters');
 	})
